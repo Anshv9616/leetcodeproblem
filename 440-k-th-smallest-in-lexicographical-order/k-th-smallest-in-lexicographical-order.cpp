@@ -1,27 +1,35 @@
 class Solution {
 private:
-    int getReqNum(long a,long b,long &n){
-        int gap=0; 
-        while(a <= n){
-            gap += min(n+1,b)-a;
-            a*=10;
-            b*=10;
+    long getCount(long prefix, long n) {
+        long count = 0;
+        long current = prefix, next = prefix + 1;
+
+        while (current <= n) {
+            count += min(n + 1, next) - current;
+            current *= 10;
+            next *= 10;
         }
-        return gap;
+        return count;
     }
+    
 public:
-    int findKthNumber(long n, int k) {
-        long num = 1;
-        for(int i=1; i<k;){
-            int req = getReqNum(num,num+1,n);
-            if(i+req <= k){
-                i+=req;
-                num++;
-            }else{
-                i++;
-                num *= 10;
+    int findKthNumber(int n, int k) {
+        long prefix = 1;
+        k--;  // Decrease k to make it zero-based
+
+        while (k > 0) {
+            long count = getCount(prefix, n);
+            if (count <= k) {
+                // Move to the next prefix
+                prefix++;
+                k -= count;  // Decrease k by the number of skipped counts
+            } else {
+                // Go down the tree
+                prefix *= 10;
+                k--;  // Decrease k for the prefix we just counted
             }
         }
-        return num;
+        
+        return static_cast<int>(prefix);
     }
 };
